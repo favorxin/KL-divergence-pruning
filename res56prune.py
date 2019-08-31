@@ -31,6 +31,8 @@ parser.add_argument('--save', default='', type=str, metavar='PATH',
                     help='path to save pruned model (default: none)')
 parser.add_argument('-v', default='A', type=str, 
                     help='version of the model')
+parser.add_argument('-type', default='kl', type=str, 
+                    help='the type of the pruning method')
 
 args = parser.parse_args()
 args.cuda = not args.no_cuda and torch.cuda.is_available()
@@ -229,7 +231,7 @@ def JS_divergence(p,q):
 #    M=np.sum([p,q],axis=0)/2
 #    return 0.5*scipy.stats.entropy(p, M)+0.5*scipy.stats.entropy(q, M)
 
-prun_type = 'kl'
+prun_type = args.type
 layer_id = 1
 cfg = []
 cfg_mask = []
@@ -349,7 +351,7 @@ for [m0, m1] in zip(model.modules(), newmodel.modules()):
         m1.weight.data = m0.weight.data.clone()
         m1.bias.data = m0.bias.data.clone()
 
-#torch.save({'cfg': cfg, 'state_dict': newmodel.state_dict()}, os.path.join(args.save, 'cifar100_resnet110_0.8_kl_1.pth.tar'))
+torch.save({'cfg': cfg, 'state_dict': newmodel.state_dict()}, os.path.join(args.save, 'cifar100_resnet110_0.8_kl_1.pth.tar'))
 
 #num_parameters = sum([param.nelement() for param in newmodel.parameters()])
 #print("number of parameters: "+str(num_parameters))
